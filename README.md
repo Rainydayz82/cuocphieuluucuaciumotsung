@@ -4,8 +4,9 @@ Final Project - Javascript / HTML / CSS
 Học viên : Nguyễn Việt Trung
 Lớp : PF2308R1
 ++++++++++++++++++++++++++
-1. khởi chạy file instruct.html để đọc hướng dẫn chơi
+1. Khởi chạy file instruct.html để đọc hướng dẫn chơi
 2. Nhấn click to start để bắt đầu chơi
 3. Nhất play again để về giao diện hướng dẫn và chơi lại
+4. Vui lòng không chỉnh sửa file trong các thư mục khác hoặc di chuyển vị trí các file
 ++++++++++++++++++++++++++
 - Cảm ơn sự dẫn dắt và hướng dẫn của giảng viên Đào Như Anh - CodeGym -
