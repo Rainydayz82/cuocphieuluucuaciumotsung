@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Play Fun !</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playpen+Sans&display=swap" rel="stylesheet"> 
+
+</head>
+<style>
+    body{
+        font-family: 'Playpen Sans', cursive;
+        background-image: url('https://wallpaper.dog/large/973258.jpg');
+        background-size: cover;
+    }
+</style>
+<body>
+<img id="idfield1" src="image/idfield1.png" style="display: none">
+<img id="idfield2" src="image/idfield2.png" style="display: none">
+<img id="idfield3" src="image/idfield3.png" style="display: none">
+<img id='idsheep' src="image/idsheep.png" style="display: none">
+<img id='idtree' src="image/idtree.png" style="display: none">
+<img id='idendcrash' src="image/idendcrash.png" style="display: none">
+<img id='idendenergy' src="image/idendenergy.png" style="display: none">
+<img id='idenergy' src="image/idenergy.png" style="display: none">                         
+<img id='idhit' src="image/idhit.png" style="display: none">
+<img id='idwolf1' src="image/idwolf1.png" onclick="collectWolf()" style="display: none">    
+<img id='idwolf2' src="image/idwolf2.png" onclick="collectWolf()" style="display: none">    
+<img id='idwolf3' src="image/idwolf3.png" onclick="collectWolf()" style="display: none">   
+
+<canvas id="idcanvas" onclick="showCoords(event)" width="1000px" height="630px" style="border: 1px solid black;"></canvas>
+
+<div>
+    <h1>ADVENTURE OF MY 1-HORN SHEEP</h1>
+</div>
+<div>
+    <a href="instruct.html"><button style="width:200px;background-color: green;color: white; font-size: 30px; font-weight: bold;">Play Again</button></a>
+</div>
+<script>
+//wolf making
+        let Wolf = function (image, imageCollected, x, y, speed, width, height, lovescore) {
+
+        this.image = image;
+        this.imageCollected = imageCollected;
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.width = width;
+        this.height = height;
+        this.lovescore = lovescore;
+
+        this.moveWolf = function () {
+            this.x = this.x + this.speed;
+        }
+        this.setWolfScore = function (newLovescore) {
+            this.lovescore += newLovescore;
+            return this.lovescore;
+        }
+
+        this.setWolfSpeed = function (newSpeed) {
+            this.speed = newSpeed;
+            return this.speed;
+        }
+
+        this.drawWolf = function (canvas) {
+
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+        this.drawHitWolf = function (canvas) {
+
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(this.imageCollected, this.x, this.y, this.width, this.height);
+        }
+        }
+
+//sheep making
+    let Sheep = function (image, x, y, speed, isMoveLeft, isMoveRight, width, height, energy) {
+
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.isMoveLeft = isMoveLeft;
+    this.isMoveRight = isMoveRight;
+    this.width = width;
+    this.height = height;
+    this.energy = energy;
+    this.image = image;
+    this.crash = false;
+    this.collectWolf = false;
+
+
+    this.positionFunction = function (x, y) {
+        let position = x + '-' + y;
+        return position;
+    }
+    this.setSpeed = function (newSpeed) {
+        this.speed = newSpeed;
+    }
+    this.fillEnergy = function (energy) {
+        this.energy += energy;
+    }
+    this.moveLeft = function () {
+        if (270 < this.x && this.isMoveLeft == true) {
+            this.x = this.x - this.speed;
+        }
+    }
+    this.moveRight = function () {
+        if (this.x < 630 && this.isMoveRight == true) {
+            this.x = this.x + this.speed;
+        }
+    }
+    this.energyBurn = function () {
+        this.energy--;
+    }
+    this.getEnergyLevel = function () {
+        return this.energy;
+    }
+    this.crashSheep = function (Tree) {
+        console.log('crash');
+        if (this.x < (Tree.x + 20) && Tree.x < this.x + (this.width - 30)) {
+            if (this.y-30 < Tree.y && Tree.y < this.y + (this.height-50)) {
+                return this.crash = true;
+            }
+        }
+    }
+    this.addEnergy = function (Energy) {
+        if (this.x < (Energy.x + 60) && Energy.x < this.x + (this.width - 30)) {
+            if (this.y < Energy.y && Energy.y < this.y + (this.width - 20)) {
+                console.log('Add energy');
+                this.energy += Energy.energy;
+            }
+        }
+    }
+    this.drawSheep = function (canvas) {
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
+}
+
+//Milktea Energy
+        let Energy = function (image, x, y, speed, width, height, energy) {
+
+        this.image = image;
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.width = width;
+        this.height = height;
+        this.energy = energy;
+
+        this.moveEnergy = function() {
+            this.y = this.y + this.speed;
+        }
+        this.setEnergylevel = function (newEnergy) {
+            this.energy += newEnergy;
+            return this.energy;
+        }
+        this.setSpeed = function (newSpeed) {
+            this.speed = newSpeed;
+            return this.speed;
+        }
+        this.drawEnergy = function (canvas) {
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(this.image,this.x,this.y,this.width,this.height);
+        }
+        }
+
+//X-Mas Tree
+        let Tree = function(image, x, y, speed, width, height) {
+
+        this.image = image;
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.width = width;
+        this.height = height;
+
+
+        this.moveDown = function () {
+            this.y = this.y + this.speed;
+        }
+        this.setSpeed = function (newSpeed) {
+            this.speed = newSpeed;
+            return this.speed;
+        }
+        this.drawTree = function (canvas) {
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+        }
+
+//Begin to play
+        let SHEEP_X = 500;
+        let SHEEP_SPEED = 10;
+        let SHEEP_WIDTH= 100;
+        let SHEEP_HEIGHT = 100;
+        let SHEEP_ENERGY = 1000;
+
+        let TREE_Y = 5;
+        let TREE_WIDTH = 50;
+        let TREE_HEIGHT = 50;
+
+        let ENERGY_Y = 5;
+        let ENERGY_SPEED = 3;
+        let ENERGY_WIDTH = 30;
+        let ENERGY_HEIGHT = 30;
+        let ENERGY_ADD = 20;
+
+        let WOLF_X = 0;
+        let WOLF_SPEED = 5;
+        let WOLF_WIDTH = 50;
+        let WIDTH_HEIGHT = 50;
+        let WOLF_SCORE = 100;
+    
+        const FONT_NAME = 'Playpen Sans';
+        const FONT_SIZE = '30px';
+
+        let canvas = document.getElementById('idcanvas');
+
+        let middleWidth = (canvas.width / 2) - 70;
+
+        let imgSheep = document.getElementById('idsheep');
+        let imgTree = document.getElementById('idtree');
+        let imgEnergy = document.getElementById('idenergy');
+        let imgHit = document.getElementById('idhit');
+        let endGameCrash = document.getElementById('idendcrash');
+        let endGameEnergy = document.getElementById('idendenergy');
+        let imgwolf1 = document.getElementById('idwolf1');
+        let imgwolf2 = document.getElementById('idwolf2');
+        let imgwolf3 = document.getElementById('idwolf3');
+        let imgfield1 = document.getElementById('idfield1');
+        let imgfield2 = document.getElementById('idfield2');
+        let imgfield3 = document.getElementById('idfield3');
+
+
+        let sheep = new Sheep(imgSheep, middleWidth, SHEEP_X, SHEEP_SPEED, false, false, SHEEP_WIDTH, SHEEP_HEIGHT, SHEEP_ENERGY);
+        let ctx = canvas.getContext("2d");
+        ctx.font = FONT_SIZE + ' ' + FONT_NAME;
+        ctx.fillStyle = "green";
+        
+
+        let count = 1;
+        let j = 60; 
+        let k = 0; 
+        let l = 0; 
+        let collectWolfIndex = 0;
+        let level = 67;
+        let newSpeed = 3;
+        let minSpeed = 0;
+        let multipleTree = [];
+        let multipleEnergy = [];
+        let multipleWolf = [];
+        let arrayWolf = [];
+        let multipleField = [];
+        let lovescore = 0;
+        let totalLovescore = 0;
+
+        //Field array:
+
+        for (let i = 0; i < 10; i++) {
+            multipleField[i] = imgfield1;
+        }
+        for (let i = 10; i < 20; i++) {
+            multipleField[i] = imgfield2;
+        }
+        for (let i = 20; i < 30; i++) {
+            multipleField[i] = imgfield3;
+        }
+
+        //Wolf Array
+        for (let i = 0; i < 10; i++) {
+            arrayWolf[i] = imgwolf1;
+        }
+        for (let i = 10; i < 20; i++) {
+            arrayWolf[i] = imgwolf2;
+        }
+        for (let i = 20; i < 30; i++) {
+            arrayWolf[i] = imgwolf3;
+        }
+
+        sheep.drawSheep(canvas);
+
+        //Set Rules of Movements
+        document.addEventListener('keyup', function (event) {
+            if (event.keyCode == 37) {
+                sheep.isMoveLeft = false;
+            } else if (event.keyCode == 39) {
+                sheep.isMoveRight = false;
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.keyCode == 37) {
+                sheep.isMoveLeft = true;
+            } else if (event.keyCode == 39) {
+                sheep.isMoveRight = true;
+            }
+        });
+
+
+        //Tree spawn
+        function spawnTree() {
+            let randomX = Math.round(Math.random() * 350) + 300;
+            let tree = new Tree(imgTree, randomX, TREE_Y, newSpeed, TREE_WIDTH, TREE_HEIGHT);
+            multipleTree.push(tree);
+        }
+
+        //Milktea spawn
+        function spawnEnergy() {
+            console.log('energy');
+            let randomX = Math.round(Math.random() * 350) + 300;
+            let energy = new Energy(imgEnergy, randomX, ENERGY_Y, ENERGY_SPEED, ENERGY_WIDTH, ENERGY_HEIGHT, ENERGY_ADD);
+            multipleEnergy.push(energy);
+        }
+
+        //Wolf spawn
+        function spawnWolf() {
+            let randomY = Math.round(Math.random() * 400) + 50;
+            let wolf = new Wolf(imgwolf1, imgHit, WOLF_X, randomY, WOLF_SPEED, WOLF_WIDTH, WIDTH_HEIGHT, WOLF_SCORE);
+            multipleWolf.push(wolf);
+        }
+
+        //Field & Sheep
+        function main() {
+            clearCanvas();
+
+        //Level-up
+            if (sheep.energy == 250) {
+                spawnEnergy();
+            }
+
+            if (j % level == 0) {
+                spawnTree();
+                k = Math.round(Math.random() *30);
+                let wolfRandom = Math.round(Math.random() *50);
+
+                if (k % 16 == 0) {
+                    spawnEnergy();
+                    console.log('Energy Spawned');
+                    console.log('Multiple Energy: ' + multipleEnergy);
+                }
+                if (wolfRandom % 26 == 0) {
+                    spawnWolf();
+                    console.log('Wolf Spawned');
+                }
+                if (level > 19) {
+                    level--;
+                    console.log('level: ' + level);
+
+                    if (minSpeed < 1) {
+                        minSpeed = minSpeed + 0.1;
+                    } else {
+                        minSpeed = 0;
+                    }
+                    newSpeed = newSpeed + Math.floor(minSpeed);
+                }
+
+            }
+            //Sheep
+            sheep.moveRight();
+            sheep.moveLeft();
+            sheep.energyBurn();
+
+            //Field
+            if (l < multipleField.length) {
+                ctx.drawImage(multipleField[l], 0, 0)
+                if (l == 29) {
+                    l = 0;
+                }
+            }
+
+            //Milktea++
+            for (let o = 0; o < multipleEnergy.length; o++) {
+                multipleEnergy[o].moveEnergy();
+                multipleEnergy[o].drawEnergy(canvas);
+                if (sheep.energy < 2001) {
+                    sheep.addEnergy(multipleEnergy[o]);
+                }
+            }
+
+            //Tree++
+            for (let i = 0; i < multipleTree.length; i++) {
+                multipleTree[i].setSpeed(newSpeed);
+                multipleTree[i].moveDown();
+                multipleTree[i].drawTree(canvas);
+                sheep.crashSheep(multipleTree[i]);
+                if (i > 10) {
+                    multipleTree.shift();
+                }
+            }
+
+            //Wolf++
+            for (let m = 0; m < multipleWolf.length; m++) {
+                multipleWolf[m].moveWolf();
+                multipleWolf[m].image = arrayWolf[l];
+                multipleWolf[m].drawWolf(canvas);
+                collectWolfIndex = m;
+                if (m > 3) {
+                    multipleWolf.shift();
+                }
+
+            }
+            sheep.drawSheep(canvas);
+            j++;
+            l++;
+            ctx.fillText("Energy: " + sheep.getEnergyLevel(), 10, 40);
+            showLovescore();
+            end();
+        }
+
+        //Count time of Sheep & Field!
+        let runGame = setInterval(main, 20);
+
+        //Show Love Score
+        function showLovescore() {
+            let lovescore2 = Math.round(j / 10);
+            totalLovescore = lovescore + lovescore2;
+            ctx.fillText('Love Score: ' + totalLovescore, 750, 40);
+        }
+
+        function showCoords(event) {
+            let x = event.clientX;
+            let y = event.clientY;
+            let coords = "X: " + x + ", Y: " + y;
+
+            let collectIndex = collectWolfIndex;
+
+            if (x < (multipleWolf[collectIndex].x + 50) && multipleWolf[collectIndex].x < x) {
+                if (y < multipleWolf[collectIndex].y + 50 && multipleWolf[collectIndex].y < y) {
+                    console.log('Collected')
+                    multipleWolf[collectIndex].drawHitWolf(canvas);
+                    lovescore += 100;
+                    multipleWolf.splice(collectIndex, 1);
+                }
+            }
+        }
+
+        //EndGame
+        function end() {
+
+            if (sheep.energy < 0) {
+                ctx.drawImage(endGameEnergy, 0, 0);
+                ctx.fillText('I LOVE U EVEN UR SCORE IS ONLY ' + totalLovescore, 340, 150);
+                clearInterval(runGame);
+            }
+
+            if (sheep.crash == true) {
+                ctx.drawImage(endGameCrash, 0, 0);
+                ctx.fillText('I LOVE U EVEN UR SCORE IS ONLY ' + totalLovescore, 340, 150);
+                clearInterval(runGame);
+            }
+        }
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+</body>
+</html>
